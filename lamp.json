@@ -1,0 +1,40 @@
+
+{
+ "Resources" :
+    {
+    "WebServer":{
+ 
+      "Type": "AWS::EC2::Instance",
+         "Properties":{
+         "ImageId" : "ami-024a64a6685d05041",
+         "KeyName" : "lamp",
+         "InstanceType":"t3.micro",
+         "SecurityGroups" : [ "lamp-sg" ],
+         "UserData" : {"Fn::Base64" : {"Fn::Join" : ["", [
+           "#!/bin/bash\n",
+           "# Launching Instance",
+           "apt-get -y install apache2 \n",
+           "apt-get -y install mysql \n",
+	   "apt-get install -y curl\n",
+	   "apt-get install -y php libapache2-mod-php php-mysql\n",
+	   "apt-get install -y php5.6\n",
+	   "apt-get install -y libapache2-mod-php5.6 php5.6-mysql php5.6-mbstring\n",
+           "apt-get -y install mysql-server \n",
+           "apt-get -y install php php5-mysql \n",
+	   "apt-get -y install wget \n",
+	   "wget -c http://wordpress.org/latest.tar.gz\n",
+	   "tar -xzvf latest.tar.gz\n",
+	   "rsync -av wordpress/* /var/www/html/\n",
+	   "chown -R www-data:www-data /var/www/html/\n"
+
+            ] ] } }
+        }
+    }
+ },
+ "Outputs":{
+    "WebsiteURL" : {
+      "Value" : { "Fn::Join" : ["", ["http://", { "Fn::GetAtt" : [        "WebServer", "PublicDnsName" ]}]] },
+        "Description" : "URL for newly created LAMP stack"
+   }
+ }
+}
